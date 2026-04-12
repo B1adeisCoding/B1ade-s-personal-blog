@@ -1,0 +1,73 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import SectionHeading from "../../components/SectionHeading.astro";
+import { getPublicCategories } from "../../lib/content";
+import { formatDate } from "../../lib/utils";
+
+const categories = await getPublicCategories();
+---
+
+<Layout title="分类">
+  <section class="section-block">
+    <SectionHeading
+      eyebrow="Browse"
+      title="公开分类"
+      body="公开主导航只保留可被正常发现的分类。隐藏分类需要通过直链或定向链接访问。"
+    />
+
+    <div class="cards-grid">
+      {categories.map((category) => (
+        <a class="category-card" href={`/categories/${category.slug}/`}>
+          <div class="category-card-header">
+            <strong>{category.name}</strong>
+            <span>{category.count} 篇内容</span>
+          </div>
+          <ul class="category-meta">
+            <li>{category.articleCount} 文章</li>
+            <li>{category.noteCount} 笔记</li>
+            <li>最近更新 {formatDate(category.latestUpdated)}</li>
+          </ul>
+        </a>
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .category-card {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1.15rem;
+    border-radius: 1.2rem;
+    background: rgba(255, 250, 242, 0.7);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .category-card-header {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .category-card span {
+    color: var(--muted);
+  }
+
+  .category-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.84rem;
+  }
+
+  .category-meta li {
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: rgba(37, 62, 54, 0.06);
+  }
+</style>

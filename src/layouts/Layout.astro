@@ -1,23 +1,158 @@
+---
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import { siteConfig } from "../lib/site";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const pageTitle = title ? `${title} | ${siteConfig.title}` : siteConfig.title;
+const pageDescription = description ?? siteConfig.description;
+const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url).toString();
+---
+
 <!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${siteConfig.title} RSS`}
+      href={new URL("/rss.xml", siteConfig.url).toString()}
+    />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+    <main class="shell">
+      <Header />
+      <slot />
+      <Footer />
+    </main>
+  </body>
 </html>
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
+<style is:global>
+  :root {
+    --paper: #f5efe4;
+    --paper-strong: #fffaf2;
+    --ink: #1f2f2a;
+    --muted: #5b655e;
+    --muted-strong: #414841;
+    --accent: #253e36;
+    --accent-soft: #dfe8d7;
+    --border: rgba(31, 47, 42, 0.16);
+    --hero: #c95c23;
+    font-family:
+      "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  }
+
+  html {
+    background:
+      radial-gradient(circle at top left, rgba(201, 92, 35, 0.16), transparent 28%),
+      radial-gradient(circle at top right, rgba(37, 62, 54, 0.16), transparent 30%),
+      linear-gradient(180deg, #efe4cf 0%, #f8f3eb 45%, #f3ece0 100%);
+    color: var(--ink);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+  }
+
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(37, 62, 54, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37, 62, 54, 0.035) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.48), transparent 90%);
+  }
+
+  .shell {
+    width: min(1120px, calc(100vw - 2rem));
+    margin: 0 auto;
+    padding-bottom: 3rem;
+    position: relative;
+  }
+
+  a {
+    color: var(--accent);
+  }
+
+  .grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+
+  .section-block {
+    margin-top: 3rem;
+  }
+
+  .hero-panel {
+    padding: clamp(1.3rem, 3vw, 2.4rem);
+    border-radius: 1.6rem;
+    background:
+      linear-gradient(135deg, rgba(37, 62, 54, 0.97), rgba(54, 84, 74, 0.88)),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent);
+    color: var(--paper);
+    box-shadow: 0 22px 80px rgba(31, 47, 42, 0.18);
+  }
+
+  .hero-panel p {
+    max-width: 60ch;
+    color: rgba(245, 239, 228, 0.82);
+  }
+
+  .meta-list,
+  .link-list,
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .meta-list li,
+  .tag-cloud li,
+  .link-list a {
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: rgba(255, 250, 242, 0.62);
+    text-decoration: none;
+  }
+
+  .empty-state {
+    padding: 1.25rem;
+    border: 1px dashed var(--border);
+    border-radius: 1rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 720px) {
+    .shell {
+      width: min(100vw - 1rem, 100%);
+    }
+  }
 </style>

@@ -1,0 +1,30 @@
+---
+import { getCollection, render } from "astro:content";
+
+import EntryPage from "../../components/EntryPage.astro";
+import { getAdjacentEntries, getRelatedEntries } from "../../lib/content";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("notes");
+  return entries.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+const [{ previous, next }, relatedEntries] = await Promise.all([
+  getAdjacentEntries(entry.id, entry.data.type, { hidden: entry.data.hidden }),
+  getRelatedEntries(entry.id, { hidden: entry.data.hidden }),
+]);
+---
+
+<EntryPage
+  entry={entry}
+  Content={Content}
+  headings={headings.filter((heading) => heading.depth === 2 || heading.depth === 3)}
+  previousEntry={previous}
+  nextEntry={next}
+  relatedEntries={relatedEntries}
+/>

@@ -7,11 +7,17 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "node ./node_modules/vitest/vitest.mjs run",
+    "import-content": "node ./scripts/import-source-content.mjs"
   },
   "dependencies": {
+    "@astrojs/rss": "^4.0.18",
     "astro": "^6.1.5"
+  },
+  "devDependencies": {
+    "vitest": "^4.0.3"
   }
 }

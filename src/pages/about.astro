@@ -1,0 +1,44 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="关于">
+  <section class="hero-panel">
+    <p class="eyebrow">About</p>
+    <h1>一个偏知识库的个人博客。</h1>
+    <p>
+      这里优先承载两类内容：完整表达的文章，以及用于长期累积、快速回查的笔记。第一版坚持
+      Markdown 驱动、静态发布、低维护成本。
+    </p>
+  </section>
+
+  <section class="section-block prose">
+    <p>
+      公开主导航只保留首页、分类、标签和关于。少量半隐藏内容不会出现在公开发现路径里，但并不具备权限保护能力。
+    </p>
+    <p>
+      如果你是第一次访问，建议从分类页进入；如果你已经知道主题，标签和搜索会更快。
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .eyebrow {
+    margin: 0 0 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.76rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2.6rem, 5vw, 4rem);
+  }
+
+  .prose {
+    max-width: 62ch;
+    color: var(--muted-strong);
+    font-size: 1.08rem;
+    line-height: 1.75;
+  }
+</style>

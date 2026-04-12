@@ -1,0 +1,84 @@
+---
+import ContentCard from "../../components/ContentCard.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getEntriesByCategorySlug, getPublicCategories } from "../../lib/content";
+
+export async function getStaticPaths() {
+  const categories = await getPublicCategories();
+  return categories.map((category) => ({
+    params: { category: category.slug },
+    props: { categoryName: category.name },
+  }));
+}
+
+const { category } = Astro.params;
+const { categoryName } = Astro.props;
+const entries = await getEntriesByCategorySlug(category!);
+const articles = entries.filter((entry) => entry.type === "article");
+const notes = entries.filter((entry) => entry.type === "note");
+---
+
+<Layout title={categoryName} description={`${categoryName} 分类下的文章与笔记`}>
+  <section class="hero-panel">
+    <p class="eyebrow">Category</p>
+    <h1>{categoryName}</h1>
+    <p>按更新时间倒序展示该分类下的公开文章与笔记，并明确区分内容类型。</p>
+    <ul class="meta-list">
+      <li>共计：{entries.length} 篇</li>
+      <li>文章：{articles.length}</li>
+      <li>笔记：{notes.length}</li>
+    </ul>
+  </section>
+
+  {articles.length > 0 && (
+    <section class="section-block">
+      <div class="section-head">
+        <h2>文章</h2>
+        <p>适合连续阅读的完整表达。</p>
+      </div>
+      <div class="grid">
+        {articles.map((entry) => <ContentCard entry={entry} />)}
+      </div>
+    </section>
+  )}
+
+  {notes.length > 0 && (
+    <section class="section-block">
+      <div class="section-head">
+        <h2>笔记</h2>
+        <p>偏信息压缩，适合回查和快速跳读。</p>
+      </div>
+      <div class="grid">
+        {notes.map((entry) => <ContentCard entry={entry} />)}
+      </div>
+    </section>
+  )}
+</Layout>
+
+<style>
+  .eyebrow {
+    margin: 0 0 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.76rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2.6rem, 5vw, 4rem);
+  }
+
+  .section-head {
+    margin-bottom: 1rem;
+  }
+
+  .section-head h2 {
+    margin: 0;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+  }
+
+  .section-head p {
+    margin: 0.45rem 0 0;
+    color: var(--muted);
+  }
+</style>

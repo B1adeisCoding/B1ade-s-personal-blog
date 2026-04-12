@@ -1,0 +1,54 @@
+---
+import ContentCard from "../../components/ContentCard.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getEntriesByTagSlug, getPublicTags } from "../../lib/content";
+
+export async function getStaticPaths() {
+  const tags = await getPublicTags();
+  return tags.map((tag) => ({
+    params: { tag: tag.slug },
+    props: { tagName: tag.name },
+  }));
+}
+
+const { tag } = Astro.params;
+const { tagName } = Astro.props;
+const entries = await getEntriesByTagSlug(tag!);
+const articleCount = entries.filter((entry) => entry.type === "article").length;
+const noteCount = entries.filter((entry) => entry.type === "note").length;
+---
+
+<Layout title={`标签：${tagName}`}>
+  <section class="hero-panel">
+    <p class="eyebrow">Tag</p>
+    <h1>{tagName}</h1>
+    <p>按更新时间倒序聚合公开内容，不将隐藏分类内容作为默认发现路径暴露出来。</p>
+    <ul class="meta-list">
+      <li>共计：{entries.length} 篇</li>
+      <li>文章：{articleCount}</li>
+      <li>笔记：{noteCount}</li>
+    </ul>
+  </section>
+
+  <section class="section-block grid">
+    {entries.length > 0 ? (
+      entries.map((entry) => <ContentCard entry={entry} />)
+    ) : (
+      <div class="empty-state">这个标签下暂时没有公开内容。</div>
+    )}
+  </section>
+</Layout>
+
+<style>
+  .eyebrow {
+    margin: 0 0 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.76rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2.6rem, 5vw, 4rem);
+  }
+</style>

@@ -1,11 +1,129 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import ContentCard from "../components/ContentCard.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import Layout from "../layouts/Layout.astro";
+import { getPublicCategories, getRecentPublicEntries } from "../lib/content";
+import { formatDate } from "../lib/utils";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const categories = await getPublicCategories();
+const recentEntries = await getRecentPublicEntries();
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="首页">
+  <section class="hero-panel">
+    <p class="eyebrow">Digital Garden / Personal Wiki</p>
+    <h1>先看地图，再决定往哪一类知识里走。</h1>
+    <p>
+      这里同时承载公开文章和长期笔记。第一入口不是自我介绍，也不是时间线，而是分类结构本身。
+    </p>
+  </section>
+
+  <section class="section-block">
+    <SectionHeading
+      eyebrow="Category Map"
+      title="分类索引"
+      body="分类是主导航结构。公开内容从这里进入，隐藏分类不会出现在这张地图里。"
+    />
+
+    <div class="cards-grid">
+      {categories.map((category) => (
+        <a class="category-card" href={`/categories/${category.slug}/`}>
+          <div class="category-card-header">
+            <strong>{category.name}</strong>
+            <span>{category.count} 篇内容</span>
+          </div>
+          <ul class="category-stats">
+            <li>{category.articleCount} 文章</li>
+            <li>{category.noteCount} 笔记</li>
+            <li>最近更新 {formatDate(category.latestUpdated)}</li>
+          </ul>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="section-block">
+    <SectionHeading
+      eyebrow="Recent Updates"
+      title="最近更新"
+      body="这里仅展示公开内容，帮助访客快速发现新增或被重写的文章与笔记。"
+    />
+
+    <div class="grid">
+      {recentEntries.map((entry) => <ContentCard entry={entry} />)}
+    </div>
+  </section>
+
+  <section class="section-block">
+    <SectionHeading
+      eyebrow="Reading Mode"
+      title="这个站点怎么读"
+      body="文章偏完整表达，适合连续阅读；笔记偏信息压缩，适合回查和快速跳读。标签和搜索是辅助入口，不替代分类本身。"
+    />
+  </section>
 </Layout>
+
+<style>
+  .eyebrow {
+    margin: 0 0 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.76rem;
+  }
+
+  h1 {
+    margin: 0;
+    max-width: 12ch;
+    font-size: clamp(2.6rem, 6vw, 5.4rem);
+    line-height: 0.95;
+  }
+
+  .category-card {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1.15rem;
+    border-radius: 1.2rem;
+    background: rgba(255, 250, 242, 0.7);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: inherit;
+    transition:
+      transform 180ms ease,
+      border-color 180ms ease;
+  }
+
+  .category-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(37, 62, 54, 0.28);
+  }
+
+  .category-card-header {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .category-card strong {
+    font-size: 1.25rem;
+  }
+
+  .category-card span {
+    color: var(--muted);
+  }
+
+  .category-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.84rem;
+  }
+
+  .category-stats li {
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: rgba(37, 62, 54, 0.06);
+  }
+</style>

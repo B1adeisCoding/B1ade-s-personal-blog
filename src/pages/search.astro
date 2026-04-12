@@ -1,0 +1,247 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="搜索">
+  <section class="hero-panel">
+    <p class="eyebrow">Search</p>
+    <h1>搜索公开内容。</h1>
+    <p>搜索索引只包含公开文章和笔记，不把隐藏分类当作公开入口暴露出来。</p>
+  </section>
+
+  <section class="section-block search-shell">
+    <label class="search-box">
+      <span>关键词</span>
+      <input id="query" type="search" placeholder="输入标题、摘要、分类或标签" />
+    </label>
+    <div class="filter-row" role="group" aria-label="内容类型过滤">
+      <button class="filter-chip is-active" type="button" data-type-filter="all">全部</button>
+      <button class="filter-chip" type="button" data-type-filter="article">文章</button>
+      <button class="filter-chip" type="button" data-type-filter="note">笔记</button>
+    </div>
+    <div id="result-count" class="result-count">输入关键词开始检索。</div>
+    <div id="results" class="grid"></div>
+  </section>
+</Layout>
+
+<script>
+  const queryInput = document.querySelector("#query");
+  const resultsRoot = document.querySelector("#results");
+  const resultCount = document.querySelector("#result-count");
+  const filterButtons = Array.from(document.querySelectorAll("[data-type-filter]"));
+  let searchIndex = [];
+  let activeTypeFilter = "all";
+
+  const escapeHtml = (value) =>
+    value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+
+  const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  const highlightText = (value, query) => {
+    const escapedValue = escapeHtml(value);
+    if (!query) return escapedValue;
+
+    const pattern = new RegExp(`(${escapeRegExp(query)})`, "ig");
+    return escapedValue.replace(pattern, "<mark>$1</mark>");
+  };
+
+  const getScore = (item, query) => {
+    const title = item.title.toLowerCase();
+    const category = item.category.toLowerCase();
+    const summary = item.summary.toLowerCase();
+    const tags = item.tags.map((tag) => tag.toLowerCase());
+
+    let score = 0;
+
+    if (title.includes(query)) score += 50;
+    if (category.includes(query)) score += 25;
+    if (tags.some((tag) => tag.includes(query))) score += 20;
+    if (summary.includes(query)) score += 10;
+
+    return score;
+  };
+
+  const renderResults = (items, query) => {
+    if (!resultsRoot || !resultCount) return;
+
+    if (!query) {
+      resultCount.textContent = "输入关键词开始检索。";
+      resultsRoot.innerHTML = "";
+      return;
+    }
+
+    const typeLabel = activeTypeFilter === "all" ? "公开结果" : activeTypeFilter === "article" ? "文章" : "笔记";
+    resultCount.textContent = `找到 ${items.length} 条${typeLabel}`;
+
+    if (items.length === 0) {
+      resultsRoot.innerHTML =
+        '<div class="empty-state">没有匹配结果。试试更短的关键词，或者切换内容类型过滤。</div>';
+      return;
+    }
+
+    resultsRoot.innerHTML = items
+      .map(
+        (item) => `
+          <article class="search-card">
+            <div class="search-meta">
+              <span>${item.type === "article" ? "文章" : "笔记"}</span>
+              <span>${highlightText(item.category, query)}</span>
+              <span>更新 ${new Date(item.updated).toLocaleDateString("zh-CN")}</span>
+            </div>
+            <h2><a href="${item.url}">${highlightText(item.title, query)}</a></h2>
+            <p>${highlightText(item.summary, query)}</p>
+            <ul>${item.tags.map((tag) => `<li>${highlightText(tag, query)}</li>`).join("")}</ul>
+          </article>
+        `,
+      )
+      .join("");
+  };
+
+  const runSearch = (query) => {
+    const normalized = query.trim().toLowerCase();
+    const items = searchIndex
+      .filter((item) => activeTypeFilter === "all" || item.type === activeTypeFilter)
+      .filter((item) => {
+        const haystack = [item.title, item.summary, item.category, ...item.tags].join(" ").toLowerCase();
+        return haystack.includes(normalized);
+      })
+      .map((item) => ({ item, score: getScore(item, normalized) }))
+      .sort((a, b) => b.score - a.score || b.item.updated.localeCompare(a.item.updated))
+      .map(({ item }) => item);
+
+    renderResults(items, normalized);
+  };
+
+  fetch("/search-index.json")
+    .then((response) => response.json())
+    .then((data) => {
+      searchIndex = data;
+      if (queryInput instanceof HTMLInputElement) {
+        queryInput.addEventListener("input", () => runSearch(queryInput.value));
+      }
+      filterButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          activeTypeFilter = button.dataset.typeFilter ?? "all";
+          filterButtons.forEach((item) => item.classList.toggle("is-active", item === button));
+          runSearch(queryInput instanceof HTMLInputElement ? queryInput.value : "");
+        });
+      });
+    });
+</script>
+
+<style>
+  .eyebrow {
+    margin: 0 0 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.76rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2.6rem, 5vw, 4rem);
+  }
+
+  .search-shell {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .filter-chip {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: rgba(255, 250, 242, 0.72);
+    padding: 0.5rem 0.85rem;
+    font: inherit;
+    color: var(--muted-strong);
+    cursor: pointer;
+  }
+
+  .filter-chip.is-active {
+    background: rgba(37, 62, 54, 0.9);
+    color: var(--paper);
+    border-color: rgba(37, 62, 54, 0.9);
+  }
+
+  .search-box {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .search-box span {
+    color: var(--muted);
+  }
+
+  .search-box input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: rgba(255, 250, 242, 0.86);
+    padding: 1rem 1.1rem;
+    font: inherit;
+    color: inherit;
+  }
+
+  .result-count {
+    color: var(--muted);
+  }
+
+  :global(.search-card) {
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 1.2rem;
+    background: rgba(255, 250, 242, 0.84);
+  }
+
+  :global(.search-card h2) {
+    margin: 0.7rem 0 0.45rem;
+  }
+
+  :global(.search-card h2 a) {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :global(.search-card p) {
+    margin: 0;
+    color: var(--muted-strong);
+  }
+
+  :global(.search-card mark) {
+    background: rgba(201, 92, 35, 0.2);
+    color: inherit;
+    padding: 0 0.15rem;
+    border-radius: 0.2rem;
+  }
+
+  :global(.search-card ul) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    list-style: none;
+    padding: 0;
+    margin: 0.85rem 0 0;
+    color: var(--muted);
+  }
+
+  :global(.search-card li),
+  :global(.search-meta span) {
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: rgba(37, 62, 54, 0.06);
+  }
+
+  :global(.search-meta) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    font-size: 0.84rem;
+    color: var(--muted);
+  }
+</style>

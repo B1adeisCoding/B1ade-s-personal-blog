@@ -1,0 +1,43 @@
+---
+import ContentCard from "../../components/ContentCard.astro";
+import Layout from "../../layouts/Layout.astro";
+import { getEntriesByCategorySlug, getHiddenCategories } from "../../lib/content";
+
+export async function getStaticPaths() {
+  const categories = await getHiddenCategories();
+  return categories.map((category) => ({
+    params: { category: category.slug },
+    props: { categoryName: category.name },
+  }));
+}
+
+const { category } = Astro.params;
+const { categoryName } = Astro.props;
+const entries = await getEntriesByCategorySlug(category!, { hidden: true });
+---
+
+<Layout title={`隐藏分类：${categoryName}`}>
+  <section class="hero-panel">
+    <p class="eyebrow">Hidden Category</p>
+    <h1>{categoryName}</h1>
+    <p>这是一个半隐藏分类页。它不出现在首页和主导航里，但允许通过直链或定向链接访问。</p>
+  </section>
+
+  <section class="section-block grid">
+    {entries.map((entry) => <ContentCard entry={entry} />)}
+  </section>
+</Layout>
+
+<style>
+  .eyebrow {
+    margin: 0 0 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.76rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2.6rem, 5vw, 4rem);
+  }
+</style>

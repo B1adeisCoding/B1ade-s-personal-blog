@@ -1,0 +1,30 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="404">
+  <section class="hero-panel">
+    <p class="eyebrow">404</p>
+    <h1>这条路径不存在。</h1>
+    <p>可以回到首页重新从分类地图进入，或者直接使用搜索。</p>
+    <p><a class="back-link" href="/">返回首页</a></p>
+  </section>
+</Layout>
+
+<style>
+  .eyebrow {
+    margin: 0 0 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.76rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2.6rem, 5vw, 4rem);
+  }
+
+  .back-link {
+    color: var(--paper);
+  }
+</style>
