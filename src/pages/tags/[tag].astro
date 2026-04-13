@@ -20,7 +20,7 @@ const noteCount = entries.filter((entry) => entry.type === "note").length;
 
 <Layout title={`标签：${tagName}`}>
   <section class="hero-panel">
-    <p class="eyebrow">Tag</p>
+    <p class="kicker">Tag</p>
     <h1>{tagName}</h1>
     <p>按更新时间倒序聚合公开内容，不将隐藏分类内容作为默认发现路径暴露出来。</p>
     <ul class="meta-list">
@@ -40,13 +40,6 @@ const noteCount = entries.filter((entry) => entry.type === "note").length;
 </Layout>
 
 <style>
-  .eyebrow {
-    margin: 0 0 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 0.76rem;
-  }
-
   h1 {
     margin: 0;
     font-size: clamp(2.6rem, 5vw, 4rem);

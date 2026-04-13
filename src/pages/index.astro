@@ -7,30 +7,94 @@ import { formatDate } from "../lib/utils";
 
 const categories = await getPublicCategories();
 const recentEntries = await getRecentPublicEntries();
+const [featuredEntry, ...secondaryEntries] = recentEntries;
+const featuredCategories = [...categories].sort((a, b) => b.count - a.count).slice(0, 6);
+const totalPublicEntries = categories.reduce((sum, category) => sum + category.count, 0);
+const latestUpdated = recentEntries[0]?.updated;
 ---
 
 <Layout title="首页">
-  <section class="hero-panel">
-    <p class="eyebrow">Digital Garden / Personal Wiki</p>
-    <h1>先看地图，再决定往哪一类知识里走。</h1>
-    <p>
-      这里同时承载公开文章和长期笔记。第一入口不是自我介绍，也不是时间线，而是分类结构本身。
-    </p>
-  </section>
+  {featuredEntry && (
+    <section class="feature-hero">
+      <div class="hero-aurora" aria-hidden="true">
+        <span class="mesh-layer mesh-layer-a"></span>
+        <span class="mesh-layer mesh-layer-b"></span>
+        <span class="glow glow-a"></span>
+        <span class="glow glow-b"></span>
+      </div>
+
+      <div class="feature-shell">
+        <div class="feature-intro">
+          <p class="hero-kicker">Featured / Recently Updated</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-story">
+            <div class="feature-meta">
+              <span class={`entry-type ${featuredEntry.type}`}>
+                {featuredEntry.type === "article" ? "文章" : "笔记"}
+              </span>
+              <span>{featuredEntry.category}</span>
+              <span>更新于 {formatDate(featuredEntry.updated)}</span>
+            </div>
+            <h1>
+              <a href={featuredEntry.url}>{featuredEntry.title}</a>
+            </h1>
+            <p>{featuredEntry.summary}</p>
+            <div class="feature-actions">
+              <a class="feature-link" href={featuredEntry.url}>继续阅读</a>
+            </div>
+          </article>
+
+          <aside class="feature-sidebar">
+            <div class="stat-stack">
+              <p>公开分类</p>
+              <strong>{categories.length}</strong>
+            </div>
+            <div class="stat-stack">
+              <p>公开内容</p>
+              <strong>{totalPublicEntries}</strong>
+            </div>
+            {latestUpdated && (
+              <div class="stat-stack">
+                <p>最近更新</p>
+                <strong>{formatDate(latestUpdated)}</strong>
+              </div>
+            )}
+            {secondaryEntries.length > 0 && (
+              <div class="mini-feed">
+                <p>继续浏览</p>
+                <ul>
+                  {secondaryEntries.slice(0, 3).map((entry) => (
+                    <li>
+                      <a href={entry.url}>{entry.title}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </aside>
+        </div>
+      </div>
+    </section>
+  )}
 
   <section class="section-block">
     <SectionHeading
-      eyebrow="Category Map"
-      title="分类索引"
-      body="分类是主导航结构。公开内容从这里进入，隐藏分类不会出现在这张地图里。"
+      eyebrow="Browse"
+      title="代表分类"
+      body="首页只保留少量代表分区，完整分类索引集中放在独立分类页里。"
     />
 
     <div class="cards-grid">
-      {categories.map((category) => (
+      {featuredCategories.map((category) => (
         <a class="category-card" href={`/categories/${category.slug}/`}>
           <div class="category-card-header">
-            <strong>{category.name}</strong>
-            <span>{category.count} 篇内容</span>
+            <div>
+              <span class="label">Category</span>
+              <strong>{category.name}</strong>
+            </div>
+            <span class="count">{category.count} 篇内容</span>
           </div>
           <ul class="category-stats">
             <li>{category.articleCount} 文章</li>
@@ -40,13 +104,17 @@ const recentEntries = await getRecentPublicEntries();
         </a>
       ))}
     </div>
+
+    <div class="section-actions">
+      <a class="browse-link" href="/categories/">查看全部分类</a>
+    </div>
   </section>
 
   <section class="section-block">
     <SectionHeading
       eyebrow="Recent Updates"
       title="最近更新"
-      body="这里仅展示公开内容，帮助访客快速发现新增或被重写的文章与笔记。"
+      body="这里只保留公开内容，用来查看最近被新增、重写或补充的条目。"
     />
 
     <div class="grid">
@@ -54,66 +122,332 @@ const recentEntries = await getRecentPublicEntries();
     </div>
   </section>
 
-  <section class="section-block">
-    <SectionHeading
-      eyebrow="Reading Mode"
-      title="这个站点怎么读"
-      body="文章偏完整表达，适合连续阅读；笔记偏信息压缩，适合回查和快速跳读。标签和搜索是辅助入口，不替代分类本身。"
-    />
-  </section>
 </Layout>
 
 <style>
-  .eyebrow {
-    margin: 0 0 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 0.76rem;
+  .feature-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 2rem;
+    min-height: 31rem;
+    isolation: isolate;
+    border: 1px solid rgba(255, 255, 255, 0.52);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.1)),
+      linear-gradient(135deg, rgba(246, 249, 255, 0.7), rgba(239, 244, 251, 0.4));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.85),
+      0 32px 96px rgba(121, 138, 168, 0.14);
   }
 
-  h1 {
+  .feature-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.42), transparent 28%),
+      radial-gradient(circle at 82% 16%, rgba(255, 255, 255, 0.32), transparent 22%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .hero-aurora {
+    position: absolute;
+    inset: -24%;
+    overflow: hidden;
+    filter: blur(36px) saturate(125%);
+    opacity: 1;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .mesh-layer,
+  .glow {
+    position: absolute;
+    inset: 0;
+    will-change: transform, opacity;
+  }
+
+  .mesh-layer {
+    mix-blend-mode: screen;
+    background-repeat: no-repeat;
+    background-size: 120% 120%;
+  }
+
+  .mesh-layer-a {
+    background-image:
+      radial-gradient(circle at 18% 28%, rgba(173, 198, 255, 0.92), transparent 28%),
+      radial-gradient(circle at 82% 22%, rgba(220, 201, 255, 0.9), transparent 30%),
+      radial-gradient(circle at 52% 76%, rgba(255, 210, 232, 0.78), transparent 28%);
+    animation:
+      meshDriftA 18s ease-in-out infinite alternate,
+      pulseAurora 9s ease-in-out infinite alternate;
+  }
+
+  .mesh-layer-b {
+    background-image:
+      radial-gradient(circle at 28% 82%, rgba(185, 233, 255, 0.72), transparent 26%),
+      radial-gradient(circle at 72% 68%, rgba(210, 222, 255, 0.6), transparent 24%),
+      radial-gradient(circle at 62% 18%, rgba(243, 214, 255, 0.54), transparent 24%);
+    animation:
+      meshDriftB 22s ease-in-out infinite alternate,
+      pulseAurora 12s ease-in-out infinite alternate;
+    animation-delay: -6s, -2s;
+  }
+
+  .glow {
+    border-radius: 50%;
+    mix-blend-mode: screen;
+  }
+
+  .glow-a {
+    top: 8%;
+    left: 10%;
+    width: 26rem;
+    height: 26rem;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.42), transparent 65%);
+    animation: floatGlowA 16s ease-in-out infinite alternate;
+  }
+
+  .glow-b {
+    right: 8%;
+    bottom: 2%;
+    width: 24rem;
+    height: 24rem;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.28), transparent 68%);
+    animation: floatGlowB 20s ease-in-out infinite alternate;
+  }
+
+  .feature-shell {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 1.25rem;
+    padding: clamp(1.2rem, 2vw, 1.6rem);
+  }
+
+  .feature-intro {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .hero-kicker {
+    margin: 0;
+    color: rgba(51, 61, 73, 0.68);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(240px, 320px);
+    gap: 1.1rem;
+    align-items: stretch;
+  }
+
+  .feature-story {
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+    padding: clamp(1.45rem, 2.4vw, 2rem);
+    border-radius: 1.7rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.42);
+    backdrop-filter: blur(24px) saturate(145%);
+    -webkit-backdrop-filter: blur(24px) saturate(145%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.74),
+      0 24px 80px rgba(126, 139, 167, 0.16);
+  }
+
+  .feature-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    color: rgba(51, 61, 73, 0.62);
+    font-size: 0.85rem;
+    letter-spacing: 0.01em;
+  }
+
+  .entry-type {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.18rem 0.58rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.32);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(43, 53, 65, 0.8);
+  }
+
+  .feature-story h1 {
     margin: 0;
     max-width: 12ch;
-    font-size: clamp(2.6rem, 6vw, 5.4rem);
+    font-size: clamp(2.6rem, 5vw, 4.5rem);
     line-height: 0.95;
+    letter-spacing: -0.03em;
+  }
+
+  .feature-story h1 a {
+    color: #303744;
+    text-decoration: none;
+  }
+
+  .feature-story h1 a:hover {
+    color: #252c37;
+  }
+
+  .feature-story p {
+    margin: 0;
+    max-width: 56ch;
+    color: rgba(51, 61, 73, 0.78);
+    font-size: 1rem;
+    line-height: 1.85;
+  }
+
+  .feature-actions {
+    margin-top: 0.4rem;
+  }
+
+  .feature-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.72rem 1.05rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.36);
+    background: rgba(255, 255, 255, 0.46);
+    color: #303744;
+    text-decoration: none;
+    font-weight: 700;
+    box-shadow: 0 12px 28px rgba(133, 145, 170, 0.12);
+  }
+
+  .feature-link:hover {
+    background: rgba(255, 255, 255, 0.62);
+  }
+
+  .feature-sidebar {
+    display: grid;
+    gap: 0.9rem;
+    align-content: start;
+    padding: 1.2rem;
+    border-radius: 1.55rem;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.38);
+    color: rgba(51, 61, 73, 0.76);
+    backdrop-filter: blur(22px) saturate(145%);
+    -webkit-backdrop-filter: blur(22px) saturate(145%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.74),
+      0 24px 72px rgba(126, 139, 167, 0.14);
+  }
+
+  .stat-stack {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .feature-sidebar p {
+    margin: 0;
+    color: rgba(51, 61, 73, 0.58);
+    letter-spacing: 0.02em;
+  }
+
+  .feature-sidebar strong {
+    font-size: clamp(1.65rem, 4vw, 2.3rem);
+    line-height: 1;
+    color: #303744;
+    font-weight: 600;
+  }
+
+  .mini-feed {
+    padding-top: 0.9rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.26);
+  }
+
+  .mini-feed ul {
+    list-style: none;
+    margin: 0.55rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .mini-feed a {
+    color: #303744;
+    text-decoration: none;
+    line-height: 1.55;
+  }
+
+  .mini-feed a:hover {
+    color: #252c37;
   }
 
   .category-card {
     display: grid;
-    gap: 0.75rem;
-    padding: 1.15rem;
-    border-radius: 1.2rem;
-    background: rgba(255, 250, 242, 0.7);
-    border: 1px solid var(--border);
+    gap: 1rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(244, 248, 250, 0.72));
     text-decoration: none;
     color: inherit;
+    box-shadow: 0 20px 44px rgba(32, 49, 63, 0.05);
     transition:
       transform 180ms ease,
-      border-color 180ms ease;
+      border-color 180ms ease,
+      box-shadow 180ms ease;
   }
 
   .category-card:hover {
     transform: translateY(-2px);
-    border-color: rgba(37, 62, 54, 0.28);
+    border-color: var(--line-strong);
+    box-shadow: 0 26px 54px rgba(32, 49, 63, 0.08);
   }
 
   .category-card-header {
-    display: grid;
-    gap: 0.35rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
   }
 
   .category-card strong {
-    font-size: 1.25rem;
+    display: block;
+    font-size: 1.35rem;
+    line-height: 1.08;
   }
 
+  .label,
+  .count,
   .category-card span {
     color: var(--muted);
+  }
+
+  .label {
+    display: inline-block;
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.68rem;
+    font-weight: 700;
+  }
+
+  .count {
+    white-space: nowrap;
+    font-size: 0.9rem;
   }
 
   .category-stats {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.55rem;
     list-style: none;
     padding: 0;
     margin: 0;
@@ -122,8 +456,122 @@ const recentEntries = await getRecentPublicEntries();
   }
 
   .category-stats li {
-    padding: 0.2rem 0.55rem;
+    padding: 0.24rem 0.58rem;
     border-radius: 999px;
-    background: rgba(37, 62, 54, 0.06);
+    background: rgba(62, 95, 115, 0.08);
+  }
+
+  .section-actions {
+    margin-top: 1rem;
+  }
+
+  .browse-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.7rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .browse-link:hover {
+    border-color: var(--line-strong);
+  }
+
+  @media (max-width: 860px) {
+    .feature-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .category-card-header {
+      flex-direction: column;
+    }
+  }
+
+  @keyframes meshDriftA {
+    0% {
+      transform: translate3d(-2%, -1%, 0) scale(1) rotate(0deg);
+      background-position:
+        18% 28%,
+        82% 22%,
+        52% 76%;
+    }
+    50% {
+      transform: translate3d(4%, -4%, 0) scale(1.08) rotate(8deg);
+      background-position:
+        24% 24%,
+        76% 28%,
+        48% 70%;
+    }
+    100% {
+      transform: translate3d(-4%, 6%, 0) scale(0.96) rotate(-7deg);
+      background-position:
+        14% 32%,
+        86% 18%,
+        56% 82%;
+    }
+  }
+
+  @keyframes meshDriftB {
+    0% {
+      transform: translate3d(3%, 2%, 0) scale(1.02) rotate(0deg);
+      background-position:
+        28% 82%,
+        72% 68%,
+        62% 18%;
+    }
+    50% {
+      transform: translate3d(-5%, -3%, 0) scale(1.1) rotate(-9deg);
+      background-position:
+        20% 74%,
+        78% 62%,
+        68% 24%;
+    }
+    100% {
+      transform: translate3d(5%, 4%, 0) scale(0.97) rotate(10deg);
+      background-position:
+        34% 86%,
+        66% 74%,
+        56% 14%;
+    }
+  }
+
+  @keyframes pulseAurora {
+    0% {
+      opacity: 0.76;
+    }
+    50% {
+      opacity: 0.94;
+    }
+    100% {
+      opacity: 0.7;
+    }
+  }
+
+  @keyframes floatGlowA {
+    0% {
+      transform: translate3d(0, 0, 0) scale(1);
+      opacity: 0.46;
+    }
+    100% {
+      transform: translate3d(8%, -6%, 0) scale(1.14);
+      opacity: 0.62;
+    }
+  }
+
+  @keyframes floatGlowB {
+    0% {
+      transform: translate3d(0, 0, 0) scale(1);
+      opacity: 0.28;
+    }
+    100% {
+      transform: translate3d(-10%, 7%, 0) scale(1.12);
+      opacity: 0.46;
+    }
   }
 </style>

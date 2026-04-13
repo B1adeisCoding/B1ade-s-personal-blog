@@ -29,11 +29,23 @@ const { entry } = Astro.props;
 
 <style>
   .card {
-    padding: 1.25rem;
-    border: 1px solid var(--border);
-    border-radius: 1.2rem;
-    background: rgba(255, 250, 242, 0.84);
-    backdrop-filter: blur(10px);
+    display: grid;
+    gap: 0.95rem;
+    padding: 1.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.44);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    box-shadow: var(--shadow-soft);
+    transition:
+      var(--transition);
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow-panel);
   }
 
   .meta-row {
@@ -47,7 +59,7 @@ const { entry } = Astro.props;
   .pill {
     display: inline-flex;
     align-items: center;
-    padding: 0.15rem 0.55rem;
+    padding: 0.18rem 0.58rem;
     border-radius: 999px;
     font-size: 0.72rem;
     font-weight: 700;
@@ -56,18 +68,19 @@ const { entry } = Astro.props;
   }
 
   .pill.article {
-    color: #7d2f16;
-    background: rgba(201, 92, 35, 0.14);
+    color: #355262;
+    background: rgba(62, 95, 115, 0.14);
   }
 
   .pill.note {
-    color: #0d5764;
-    background: rgba(25, 124, 140, 0.14);
+    color: #274753;
+    background: rgba(74, 114, 136, 0.14);
   }
 
   h3 {
-    margin: 0.75rem 0 0.55rem;
+    margin: 0;
     font-size: 1.32rem;
+    line-height: 1.15;
   }
 
   h3 a {
@@ -76,11 +89,11 @@ const { entry } = Astro.props;
   }
 
   h3 a:hover {
-    text-decoration: underline;
+    color: var(--accent-strong);
   }
 
   p {
-    margin: 0 0 0.9rem;
+    margin: 0;
     color: var(--muted-strong);
   }
 
@@ -98,7 +111,8 @@ const { entry } = Astro.props;
   .tags li {
     padding: 0.2rem 0.55rem;
     border-radius: 999px;
-    background: rgba(37, 62, 54, 0.06);
+    background: rgba(255, 255, 255, 0.34);
+    border: 1px solid rgba(255, 255, 255, 0.38);
   }
 
   .card-footer {
@@ -117,6 +131,6 @@ const { entry } = Astro.props;
   }
 
   .read-more:hover {
-    text-decoration: underline;
+    color: var(--accent-strong);
   }
 </style>

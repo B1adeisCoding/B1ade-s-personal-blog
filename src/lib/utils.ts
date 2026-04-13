@@ -13,3 +13,15 @@ export function formatDate(date: Date): string {
     day: "numeric",
   }).format(date);
 }
+
+export function stripMarkdown(value: string): string {
+  return value
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/<\/?[^>]+>/g, "")
+    .replace(/^[>\-+*#]+\s*/gm, "")
+    .replace(/`+/g, "")
+    .replace(/[*_~]+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}

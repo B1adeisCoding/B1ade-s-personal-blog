@@ -20,9 +20,9 @@ const notes = entries.filter((entry) => entry.type === "note");
 
 <Layout title={categoryName} description={`${categoryName} 分类下的文章与笔记`}>
   <section class="hero-panel">
-    <p class="eyebrow">Category</p>
+    <p class="kicker">Category / {categoryName}</p>
     <h1>{categoryName}</h1>
-    <p>按更新时间倒序展示该分类下的公开文章与笔记，并明确区分内容类型。</p>
+    <p>这个分区下的公开内容按照更新时间倒序排列，并保留文章与笔记两条阅读路径。</p>
     <ul class="meta-list">
       <li>共计：{entries.length} 篇</li>
       <li>文章：{articles.length}</li>
@@ -34,7 +34,7 @@ const notes = entries.filter((entry) => entry.type === "note");
     <section class="section-block">
       <div class="section-head">
         <h2>文章</h2>
-        <p>适合连续阅读的完整表达。</p>
+        <p>偏完整表达，适合顺着主题连续读下去。</p>
       </div>
       <div class="grid">
         {articles.map((entry) => <ContentCard entry={entry} />)}
@@ -46,7 +46,7 @@ const notes = entries.filter((entry) => entry.type === "note");
     <section class="section-block">
       <div class="section-head">
         <h2>笔记</h2>
-        <p>偏信息压缩，适合回查和快速跳读。</p>
+        <p>以高频信息和工作记录为主，适合带着问题快速定位。</p>
       </div>
       <div class="grid">
         {notes.map((entry) => <ContentCard entry={entry} />)}
@@ -56,20 +56,27 @@ const notes = entries.filter((entry) => entry.type === "note");
 </Layout>
 
 <style>
-  .eyebrow {
-    margin: 0 0 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 0.76rem;
-  }
-
   h1 {
     margin: 0;
     font-size: clamp(2.6rem, 5vw, 4rem);
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-panel p,
+  .meta-list {
+    position: relative;
+    z-index: 1;
   }
 
   .section-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    align-items: end;
     margin-bottom: 1rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--line);
   }
 
   .section-head h2 {
@@ -78,7 +85,15 @@ const notes = entries.filter((entry) => entry.type === "note");
   }
 
   .section-head p {
-    margin: 0.45rem 0 0;
+    margin: 0;
     color: var(--muted);
+    max-width: 34rem;
+  }
+
+  @media (max-width: 700px) {
+    .section-head {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 </style>

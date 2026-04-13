@@ -1,0 +1,57 @@
+---
+interface Props {
+  fallbackHref?: string;
+  label?: string;
+}
+
+const { fallbackHref = "/", label = "返回上一页" } = Astro.props;
+---
+
+<button class="page-back" type="button" data-fallback-href={fallbackHref}>
+  <span aria-hidden="true">←</span>
+  <span>{label}</span>
+</button>
+
+<script>
+  const button = document.querySelector(".page-back");
+
+  if (button instanceof HTMLButtonElement) {
+    button.addEventListener("click", () => {
+      const fallbackHref = button.dataset.fallbackHref ?? "/";
+      const sameOriginReferrer =
+        document.referrer && new URL(document.referrer).origin === window.location.origin;
+
+      if (sameOriginReferrer && window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+
+      window.location.href = fallbackHref;
+    });
+  }
+</script>
+
+<style>
+  .page-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0 0 1.25rem;
+    padding: 0.52rem 0.86rem;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.42);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    box-shadow: var(--shadow-soft);
+    color: var(--muted-strong);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .page-back:hover {
+    transform: translateY(-1px);
+    border-color: var(--line-strong);
+    color: var(--accent-strong);
+  }
+</style>

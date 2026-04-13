@@ -1,6 +1,7 @@
 ---
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
+import PageBack from "../components/PageBack.astro";
 import { siteConfig } from "../lib/site";
 
 interface Props {
@@ -12,6 +13,7 @@ const { title, description } = Astro.props;
 const pageTitle = title ? `${title} | ${siteConfig.title}` : siteConfig.title;
 const pageDescription = description ?? siteConfig.description;
 const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url).toString();
+const showPageBack = Astro.url.pathname !== "/";
 ---
 
 <!doctype html>
@@ -36,6 +38,7 @@ const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url).toString();
     <div class="backdrop"></div>
     <main class="shell">
       <Header />
+      {showPageBack && <PageBack />}
       <slot />
       <Footer />
     </main>
@@ -44,41 +47,90 @@ const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url).toString();
 
 <style is:global>
   :root {
-    --paper: #f5efe4;
-    --paper-strong: #fffaf2;
-    --ink: #1f2f2a;
-    --muted: #5b655e;
-    --muted-strong: #414841;
-    --accent: #253e36;
-    --accent-soft: #dfe8d7;
-    --border: rgba(31, 47, 42, 0.16);
-    --hero: #c95c23;
+    --bg: #f7f9fc;
+    --bg-soft: #f2f5fb;
+    --surface: rgba(255, 255, 255, 0.58);
+    --surface-strong: rgba(255, 255, 255, 0.74);
+    --surface-heavy: rgba(255, 255, 255, 0.84);
+    --surface-dark: rgba(63, 84, 118, 0.72);
+    --surface-dark-strong: rgba(42, 57, 83, 0.84);
+    --ink: #2a313a;
+    --muted: #697586;
+    --muted-strong: #4f5b6b;
+    --accent: #60779f;
+    --accent-strong: #4f6588;
+    --accent-soft: rgba(127, 147, 200, 0.12);
+    --accent-soft-strong: rgba(127, 147, 200, 0.2);
+    --line: rgba(255, 255, 255, 0.42);
+    --line-strong: rgba(255, 255, 255, 0.58);
+    --border: var(--line);
+    --paper: #fbfdff;
+    --hero: var(--accent);
+    --shadow-soft: 0 24px 64px rgba(126, 143, 175, 0.14);
+    --shadow-panel: 0 36px 110px rgba(126, 143, 175, 0.18);
+    --radius-lg: 1.6rem;
+    --radius-md: 1.15rem;
+    --radius-sm: 0.9rem;
+    --blur-lg: blur(22px) saturate(145%);
+    --blur-md: blur(18px) saturate(140%);
+    --transition: all 0.3s ease;
     font-family:
-      "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+      Inter, Roboto, "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
 
   html {
     background:
-      radial-gradient(circle at top left, rgba(201, 92, 35, 0.16), transparent 28%),
-      radial-gradient(circle at top right, rgba(37, 62, 54, 0.16), transparent 30%),
-      linear-gradient(180deg, #efe4cf 0%, #f8f3eb 45%, #f3ece0 100%);
+      radial-gradient(circle at 10% 8%, rgba(188, 208, 255, 0.72), transparent 30%),
+      radial-gradient(circle at 88% 10%, rgba(230, 205, 255, 0.6), transparent 28%),
+      radial-gradient(circle at 82% 84%, rgba(198, 233, 255, 0.54), transparent 30%),
+      radial-gradient(circle at 22% 82%, rgba(255, 222, 238, 0.4), transparent 24%),
+      linear-gradient(180deg, #f8fbff 0%, #eff4fb 46%, #e8eff8 100%);
     color: var(--ink);
+  }
+
+  * {
+    box-sizing: border-box;
   }
 
   body {
     margin: 0;
     min-height: 100vh;
+    background: transparent;
+    position: relative;
   }
 
   .backdrop {
     position: fixed;
     inset: 0;
     pointer-events: none;
-    background-image:
-      linear-gradient(rgba(37, 62, 54, 0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(37, 62, 54, 0.035) 1px, transparent 1px);
-    background-size: 36px 36px;
-    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.48), transparent 90%);
+    background:
+      linear-gradient(
+        180deg,
+        rgba(191, 209, 255, 0.18) 0%,
+        rgba(244, 232, 255, 0.14) 18%,
+        rgba(206, 233, 255, 0.12) 38%,
+        rgba(255, 228, 240, 0.08) 58%,
+        rgba(204, 228, 255, 0.11) 78%,
+        rgba(245, 236, 255, 0.1) 100%
+      ),
+      radial-gradient(circle at 50% 6%, rgba(192, 212, 255, 0.34), transparent 26%),
+      radial-gradient(circle at 18% 34%, rgba(203, 236, 255, 0.22), transparent 22%),
+      radial-gradient(circle at 82% 40%, rgba(235, 211, 255, 0.24), transparent 24%),
+      radial-gradient(circle at 30% 68%, rgba(255, 222, 238, 0.16), transparent 20%),
+      radial-gradient(circle at 72% 78%, rgba(196, 230, 255, 0.18), transparent 24%),
+      radial-gradient(circle at 8% 16%, rgba(255, 255, 255, 0.82), transparent 20%),
+      radial-gradient(circle at 94% 12%, rgba(220, 231, 255, 0.68), transparent 18%),
+      radial-gradient(circle at 80% 84%, rgba(240, 221, 255, 0.58), transparent 20%),
+      radial-gradient(circle at 18% 88%, rgba(214, 240, 255, 0.48), transparent 18%),
+      linear-gradient(rgba(125, 145, 180, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(125, 145, 180, 0.03) 1px, transparent 1px);
+    background-size:
+      auto,
+      auto,
+      auto,
+      44px 44px,
+      44px 44px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.26) 74%, transparent 96%);
   }
 
   .shell {
@@ -90,6 +142,21 @@ const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url).toString();
 
   a {
     color: var(--accent);
+    transition: var(--transition);
+  }
+
+  p,
+  li {
+    line-height: 1.78;
+    letter-spacing: 0.01em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.03em;
+    line-height: 1.02;
   }
 
   .grid {
@@ -104,22 +171,40 @@ const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url).toString();
   }
 
   .section-block {
-    margin-top: 3rem;
+    margin-top: 3.5rem;
   }
 
   .hero-panel {
-    padding: clamp(1.3rem, 3vw, 2.4rem);
-    border-radius: 1.6rem;
+    position: relative;
+    overflow: hidden;
+    padding: clamp(1.5rem, 3vw, 2.8rem);
+    border-radius: var(--radius-lg);
     background:
-      linear-gradient(135deg, rgba(37, 62, 54, 0.97), rgba(54, 84, 74, 0.88)),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent);
-    color: var(--paper);
-    box-shadow: 0 22px 80px rgba(31, 47, 42, 0.18);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.54), rgba(255, 255, 255, 0.28)),
+      linear-gradient(140deg, rgba(244, 248, 255, 0.76), rgba(240, 245, 252, 0.5));
+    color: var(--ink);
+    box-shadow: var(--shadow-panel);
+    border: 1px solid rgba(255, 255, 255, 0.44);
+    backdrop-filter: var(--blur-lg);
+    -webkit-backdrop-filter: var(--blur-lg);
+  }
+
+  .hero-panel::before {
+    content: "";
+    position: absolute;
+    inset: auto -8% -32% auto;
+    width: clamp(260px, 34vw, 420px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(205, 217, 255, 0.52), transparent 66%);
+    pointer-events: none;
   }
 
   .hero-panel p {
     max-width: 60ch;
-    color: rgba(245, 239, 228, 0.82);
+    color: var(--muted-strong);
+    position: relative;
+    z-index: 1;
   }
 
   .meta-list,
@@ -136,18 +221,70 @@ const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url).toString();
   .meta-list li,
   .tag-cloud li,
   .link-list a {
-    padding: 0.35rem 0.75rem;
+    padding: 0.42rem 0.82rem;
     border-radius: 999px;
-    border: 1px solid var(--border);
-    background: rgba(255, 250, 242, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    background: rgba(255, 255, 255, 0.34);
     text-decoration: none;
   }
 
   .empty-state {
     padding: 1.25rem;
-    border: 1px dashed var(--border);
-    border-radius: 1rem;
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-md);
     color: var(--muted);
+    background: var(--surface);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+  }
+
+  .panel {
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    background: rgba(255, 255, 255, 0.42);
+    backdrop-filter: var(--blur-lg);
+    -webkit-backdrop-filter: var(--blur-lg);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .panel-muted {
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    background: rgba(255, 255, 255, 0.34);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+  }
+
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0 0 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  .kicker::before {
+    content: "";
+    width: 2.6rem;
+    height: 1px;
+    background: rgba(105, 117, 134, 0.34);
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button,
+  [role="button"],
+  .buttonish {
+    transition: var(--transition);
   }
 
   @media (max-width: 720px) {

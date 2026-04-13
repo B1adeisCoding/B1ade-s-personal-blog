@@ -8,21 +8,30 @@ const categories = await getPublicCategories();
 ---
 
 <Layout title="分类">
+  <section class="hero-panel">
+    <p class="kicker">Browse / Categories</p>
+    <div class="hero-copy">
+      <h1>完整分类索引</h1>
+      <p>所有公开分类集中在这里。每个条目都保留数量、类型拆分和最近更新时间，方便快速判断从哪里进入。</p>
+    </div>
+  </section>
+
   <section class="section-block">
     <SectionHeading
       eyebrow="Browse"
       title="公开分类"
-      body="公开主导航只保留可被正常发现的分类。隐藏分类需要通过直链或定向链接访问。"
+      body="分类数量继续增长时，这里会比首页承担更完整、更高密度的浏览任务。"
     />
 
-    <div class="cards-grid">
+    <div class="category-directory">
       {categories.map((category) => (
-        <a class="category-card" href={`/categories/${category.slug}/`}>
-          <div class="category-card-header">
+        <a class="category-row" href={`/categories/${category.slug}/`}>
+          <div class="category-main">
+            <span class="label">Category</span>
             <strong>{category.name}</strong>
-            <span>{category.count} 篇内容</span>
           </div>
           <ul class="category-meta">
+            <li class="count">{category.count} 篇内容</li>
             <li>{category.articleCount} 文章</li>
             <li>{category.noteCount} 笔记</li>
             <li>最近更新 {formatDate(category.latestUpdated)}</li>
@@ -34,30 +43,76 @@ const categories = await getPublicCategories();
 </Layout>
 
 <style>
-  .category-card {
+  .hero-copy {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-copy h1 {
+    margin: 0;
+    max-width: 12ch;
+    font-size: clamp(2.7rem, 5vw, 4.6rem);
+    line-height: 0.94;
+  }
+
+  .hero-copy p {
+    margin: 0.9rem 0 0;
+  }
+
+  .category-directory {
     display: grid;
-    gap: 0.75rem;
-    padding: 1.15rem;
-    border-radius: 1.2rem;
-    background: rgba(255, 250, 242, 0.7);
-    border: 1px solid var(--border);
+    gap: 0.85rem;
+  }
+
+  .category-row {
+    display: grid;
+    grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem 1.15rem;
+    border-radius: var(--radius-md);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(244, 248, 250, 0.72));
+    border: 1px solid var(--line);
     text-decoration: none;
     color: inherit;
+    transition:
+      transform 180ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease;
+    box-shadow: 0 18px 40px rgba(32, 49, 63, 0.05);
   }
 
-  .category-card-header {
-    display: grid;
-    gap: 0.35rem;
+  .category-row:hover {
+    transform: translateY(-2px);
+    border-color: var(--line-strong);
+    box-shadow: 0 24px 50px rgba(32, 49, 63, 0.08);
   }
 
-  .category-card span {
+  .category-main {
+    min-width: 0;
+  }
+
+  .label {
+    display: inline-block;
+    margin-bottom: 0.3rem;
     color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.68rem;
+    font-weight: 700;
+  }
+
+  .category-main strong {
+    display: block;
+    font-size: 1.35rem;
+    line-height: 1.08;
   }
 
   .category-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    justify-content: flex-end;
+    gap: 0.55rem;
     list-style: none;
     padding: 0;
     margin: 0;
@@ -66,8 +121,24 @@ const categories = await getPublicCategories();
   }
 
   .category-meta li {
-    padding: 0.2rem 0.55rem;
+    padding: 0.24rem 0.58rem;
     border-radius: 999px;
-    background: rgba(37, 62, 54, 0.06);
+    background: rgba(62, 95, 115, 0.08);
+  }
+
+  .category-meta .count {
+    background: rgba(47, 73, 88, 0.12);
+    color: var(--muted-strong);
+  }
+
+  @media (max-width: 860px) {
+    .category-row {
+      grid-template-columns: 1fr;
+      align-items: flex-start;
+    }
+
+    .category-meta {
+      justify-content: flex-start;
+    }
   }
 </style>

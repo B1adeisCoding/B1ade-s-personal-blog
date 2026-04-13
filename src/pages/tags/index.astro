@@ -7,6 +7,12 @@ const tags = await getPublicTags();
 ---
 
 <Layout title="标签">
+  <section class="hero-panel">
+    <p class="kicker">Cross References</p>
+    <h1>标签聚合</h1>
+    <p>标签负责串联跨分类主题，只展示公开内容产生的关联。</p>
+  </section>
+
   <section class="section-block">
     <SectionHeading
       eyebrow="Cross References"
@@ -30,7 +36,17 @@ const tags = await getPublicTags();
   }
 
   .tag-cloud li {
-    background: rgba(255, 250, 242, 0.7);
+    background: rgba(255, 255, 255, 0.42);
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition);
+  }
+
+  .tag-cloud li:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-panel);
   }
 
   .tag-cloud a {

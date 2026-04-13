@@ -4,41 +4,44 @@ import Layout from "../layouts/Layout.astro";
 
 <Layout title="关于">
   <section class="hero-panel">
-    <p class="eyebrow">About</p>
-    <h1>一个偏知识库的个人博客。</h1>
-    <p>
-      这里优先承载两类内容：完整表达的文章，以及用于长期累积、快速回查的笔记。第一版坚持
-      Markdown 驱动、静态发布、低维护成本。
-    </p>
+    <p class="kicker">About</p>
+    <h1>这个页面暂时留空。</h1>
+    <p>后续会逐步补充更多内容和小功能；当前先作为一个保留入口。</p>
   </section>
 
-  <section class="section-block prose">
-    <p>
-      公开主导航只保留首页、分类、标签和关于。少量半隐藏内容不会出现在公开发现路径里，但并不具备权限保护能力。
-    </p>
-    <p>
-      如果你是第一次访问，建议从分类页进入；如果你已经知道主题，标签和搜索会更快。
-    </p>
+  <section class="section-block placeholder-card">
+    <p>建设中。</p>
+    <p>以后这里会开放一些独立页面、实验内容或轻量展示模块。</p>
   </section>
 </Layout>
 
 <style>
-  .eyebrow {
-    margin: 0 0 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-size: 0.76rem;
-  }
-
   h1 {
     margin: 0;
     font-size: clamp(2.6rem, 5vw, 4rem);
   }
 
-  .prose {
-    max-width: 62ch;
+  .placeholder-card {
+    max-width: 44rem;
+    display: grid;
+    gap: 0.45rem;
+    padding: 1.3rem 1.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.38);
+    backdrop-filter: var(--blur-md);
+    -webkit-backdrop-filter: var(--blur-md);
+    box-shadow: var(--shadow-soft);
     color: var(--muted-strong);
-    font-size: 1.08rem;
-    line-height: 1.75;
+  }
+
+  .placeholder-card p {
+    margin: 0;
+    line-height: 1.7;
+  }
+
+  .placeholder-card p:first-child {
+    font-weight: 700;
+    color: var(--ink);
   }
 </style>

@@ -12,7 +12,7 @@ import {
   type NormalizedEntry,
   type TagGroup,
 } from "./content-model";
-import { slugify } from "./utils";
+import { slugify, stripMarkdown } from "./utils";
 
 function normalizeTextList(values: string[]): { labels: string[]; slugs: string[] } {
   const labels = [...new Set(values.map((value) => value.trim()).filter(Boolean))];
@@ -52,7 +52,7 @@ async function loadCollectionEntries(
       slug: entry.id,
       collection,
       title: entry.data.title,
-      summary: entry.data.summary,
+      summary: stripMarkdown(entry.data.summary),
       type: entry.data.type,
       category: entry.data.category.trim(),
       categorySlug,
